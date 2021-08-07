@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title>Dicee</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css?family=Indie+Flower|Lobster" rel="stylesheet">
+
+</head>
+
+<body>
+  <div class="container">
+
+    <h1 class="main-title">Welcome! Choose Your Purpose:</h1>
+    <div class="version-btns">
+      <button class="version-btn" onclick="noGameVersion()">Just need dices</button>
+      <button class="version-btn" onclick="gameVersion()">Play dice game</button>
+    </div>
+
+    <div class="dice-container">
+      <div class="dice">
+        <p class="playerNum1">Player 1</p>
+        <img class="img1" src="images/dice6.png">
+      </div>
+      <div class="dice">
+        <p class="playerNum2">Player 2</p>
+        <img class="img2" src="images/dice6.png">
+      </div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="refresh()">Roll!</button>
+
+  <script src="index.js" charset="utf-8"></script>
+</body>
+
+<footer>
+  Osho 🎲 2021
+</footer>
+
+</html>
