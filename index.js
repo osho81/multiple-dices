@@ -69,10 +69,10 @@ function addDice() {
 }
 
 function removeDice() {
-  if (currentPlayers.length > 1) {
+  if ((gameOn && currentPlayers.length > 2) || (!gameOn && currentPlayers.length > 1)) {
     document.querySelector('.dice' + currentPlayers.length).remove();
     currentPlayers.pop();
-  }
+  } 
 }
 
 /* ----- ROLLING DICES ----- */
