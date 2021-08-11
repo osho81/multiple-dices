@@ -1,50 +1,181 @@
 let gameOn;
+let dicesRolled = [];
+let currentPlayers = [1, 2];  // Default starts with 2 dices/players
 
-document.querySelector('.dice-container').style.visibility = "hidden";
-document.querySelector('.btn').style.visibility = "hidden";
+// Audio
+const diceSound = new Audio('audio/diceSound.mp3');
+const winSound = new Audio('audio/winSound.mp3');
 
-// If just want to roll dices, don't display game components and set gameOn false
+// General components not displayed at start
+document.querySelector('.remove-btn').style.visibility = "hidden";
+document.querySelector('.add-btn').style.visibility = "hidden";
+document.querySelector('.dice-container').style.display = "none";
+document.querySelector('.roll-btn').style.visibility = "hidden";
+document.querySelector('.again-btn').style.display = "none";
+
+// If chose roll dices only, display general components & undisplay game components and set gameOn false
 function noGameVersion() {
-  document.querySelector('.dice-container').style.visibility = "initial";
-  document.querySelector('.btn').style.visibility = "initial";
+  document.querySelector('.remove-btn').style.visibility = "initial";
+  document.querySelector('.add-btn').style.visibility = "initial";
+  document.querySelector('.dice-container').style.display = "initial";
+  document.querySelector('.roll-btn').style.visibility = "initial";
   document.querySelector('.version-btns').style.display = "none";
-  document.querySelector(".main-title").innerHTML = "Roll On!";
-  document.querySelector(".playerNum1").innerHTML = "";
-  document.querySelector(".playerNum2").innerHTML = "";
+  document.querySelector('.main-title').innerHTML = "Roll On!";
+  document.querySelector('.player1').style.visibility = "hidden";
+  document.querySelector('.player2').style.visibility = "hidden";
 
   gameOn = false;
 }
 
-// If want to play dice game, display game components and set gameOn true
+// If chose dice game, display game components and set gameOn true
 function gameVersion() {
-  document.querySelector('.dice-container').style.visibility = "initial";
-  document.querySelector('.btn').style.visibility = "initial";
+  document.querySelector('.remove-btn').style.visibility = "initial";
+  document.querySelector('.add-btn').style.visibility = "initial";
+  document.querySelector('.dice-container').style.display = "initial";
+  document.querySelector('.roll-btn').style.visibility = "initial";
   document.querySelector('.version-btns').style.display = "none";
   document.querySelector(".main-title").innerHTML = "Game On!";
 
   gameOn = true;
 }
 
-//refresh on roll-button click, and if gameOn is true >> name the winner 
-function refresh() {
-  var player1Dice = Math.floor(Math.random() * 6) + 1;
-  var player2Dice = Math.floor(Math.random() * 6) + 1;
+function addDice() {
+  if (currentPlayers.length < 10) {
+    currentPlayers.push(currentPlayers.length + 1);
 
-  var imagePlayer1 = "images/dice" + player1Dice + ".png";
-  var imagePlayer2 = "images/dice" + player2Dice + ".png";
+    // Create new div-element and add two classes
+    const dice = document.createElement('div');
+    dice.classList.add('dice' + currentPlayers.length, 'dice');
+    document.querySelector('.dice-container').appendChild(dice);
 
-  document.querySelector(".img1").setAttribute("src", imagePlayer1);
-  document.querySelector(".img2").setAttribute("src", imagePlayer2);
+    // Create/append paragraph & text to new dice
+    const player = document.createElement('P');
+    const playerText = document.createTextNode('Player ' + currentPlayers.length);
+    player.classList.add('player' + currentPlayers.length, 'player');
+    player.appendChild(playerText);
+    document.querySelector('.dice' + currentPlayers.length).appendChild(player);
 
-  if (gameOn) {
-    if (player1Dice === player2Dice) {
-      document.querySelector(".main-title").innerHTML = "Draw!";
-    } else if (player1Dice > player2Dice) {
-      document.querySelector(".main-title").innerHTML = "Player 1 wins!";
-    } else {
-      document.querySelector(".main-title").innerHTML = "Player 2 wins!";
+    // Create/append image to new dice
+    const image = document.createElement('img');
+    image.setAttribute('class', 'img' + currentPlayers.length);
+    image.setAttribute('src', 'images/dice6.png');
+    document.querySelector('.dice' + currentPlayers.length).appendChild(image);
+
+    // Hide player number, if not playing game
+    if (!gameOn) {
+      document.querySelector('.player' + currentPlayers.length).style.visibility = "hidden";
     }
   }
 }
 
-//comment ust to make a branch
+function removeDice() {
+  if (currentPlayers.length > 1) {
+    document.querySelector('.dice' + currentPlayers.length).remove();
+    currentPlayers.pop();
+  }
+}
+
+/* ----- ROLLING DICES ----- */
+
+function refresh() {
+  diceSound.play();
+
+  currentPlayers.forEach(i => {
+    const rolledNum = Math.floor(Math.random() * 6) + 1;
+    const numImage = 'images/dice' + rolledNum + '.png';
+
+    // Remove current dice's p and img
+    document.querySelector('.player' + i).remove()
+    document.querySelector('.img' + i).remove()
+
+    // Create/append NEW paragraph & text to new dice
+    const player = document.createElement('P');
+    const playerText = document.createTextNode('Player ' + i);
+    player.classList.add('player' + i, 'player');
+    player.appendChild(playerText);
+    document.querySelector('.dice' + i).appendChild(player);
+
+    // Create/append NEW image to new dice
+    const image = document.createElement('img');
+    image.setAttribute('class', 'img' + i);
+    image.setAttribute('src', numImage);
+    document.querySelector('.dice' + i).appendChild(image);
+
+    // Store player's dice as obj, then push it into the dedicated empty list
+    rollObj = { player_id: i, diceRoll: rolledNum };
+    dicesRolled.push(rollObj);
+
+    // If game not on, hide player number
+    if (!gameOn) {
+      document.querySelector('.player' + i).style.visibility = "hidden";
+    }
+  });
+
+  /* ----- CHECKING WINNER ----- */
+
+  if (gameOn && currentPlayers.length > 1) {
+    // Hide add-btn & remove-btn
+    document.querySelector('.remove-btn').style.visibility = "hidden";
+    document.querySelector('.add-btn').style.visibility = "hidden";
+
+    // Check for highest dice roll
+    let tempHighest = 0;
+    for (let i = 0; i < currentPlayers.length; i++) {
+      if (dicesRolled[i].diceRoll > tempHighest) {
+        tempHighest = dicesRolled[i].diceRoll;
+      }
+    }
+
+    // Deal with player(s) that didn't get highest dice roll
+    for (let i = 0; i < dicesRolled.length; i++) {
+      if (dicesRolled[i].diceRoll < tempHighest) {
+        document.querySelector('.dice' + dicesRolled[i].player_id).classList.remove('dice' + dicesRolled[i].player_id);
+
+        //change their opacity and remove current dice's p and img classes
+        document.querySelector('.player' + dicesRolled[i].player_id).style.opacity = 0.7;
+        document.querySelector('.player' + dicesRolled[i].player_id).classList.remove('player' + dicesRolled[i].player_id);
+        document.querySelector('.img' + dicesRolled[i].player_id).style.opacity = 0.15;
+        document.querySelector('.img' + dicesRolled[i].player_id).classList.remove('img' + dicesRolled[i].player_id);
+
+        // Delete them from list of current players
+        const findCurrentIndex = currentPlayers.indexOf(dicesRolled[i].player_id);
+        currentPlayers.splice(findCurrentIndex, 1);
+      }
+    }
+
+    // If more than one player got highest dice roll, name them for next round
+    let nextRoundPlayers = "";
+    if (currentPlayers.length > 1) {
+      for (let i = 0; i < currentPlayers.length; i++) {
+        nextRoundPlayers += ' &nbsp ' + currentPlayers[i] + ',';
+      }
+
+      document.querySelector('.main-title').innerHTML =
+        "Players to next round: Player " + nextRoundPlayers.replace(/.$/, ".");
+
+      // When only one player left, name and celebrate the winner
+    } else if (currentPlayers.length == 1) {
+      document.querySelector('.main-title').innerHTML = "Winner is Player &nbsp" + currentPlayers[0] + " !";
+      document.querySelector('.main-title').style.color = 'rgb(176, 255, 255)';
+
+      // Add animation class to winning player & play winning sound
+      document.querySelector('.img' + currentPlayers[0]).classList.add('winner');
+      winSound.play();
+
+      // Undisplay roll-button & display play-again-button
+      document.querySelector('.roll-btn').style.display = "none";
+      document.querySelector('.again-btn').style.display = "initial";
+    }
+  }
+
+  // Empty the list of rolled dices before next round
+  dicesRolled = [];
+}
+
+function playAgain() {
+  setTimeout(function () { document.location.href = ''; }, 500);
+}
+
+
+
+

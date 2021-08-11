@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Dicee</title>
+  <title>Dices</title>
   <link rel="stylesheet" href="styles.css">
   <link href="https://fonts.googleapis.com/css?family=Indie+Flower|Lobster" rel="stylesheet">
 
@@ -18,19 +18,25 @@
       <button class="version-btn" onclick="gameVersion()">Play dice game</button>
     </div>
 
+    <div class="num-btns">
+      <button class="remove-btn" onclick="removeDice()">➖</button>
+      <button class="add-btn" onclick="addDice()">➕</button>
+    </div>
+
     <div class="dice-container">
-      <div class="dice">
-        <p class="playerNum1">Player 1</p>
+      <div class="dice1 dice">
+        <p class="player1">Player 1</p>
         <img class="img1" src="images/dice6.png">
       </div>
-      <div class="dice">
-        <p class="playerNum2">Player 2</p>
+      <div class="dice2 dice">
+        <p class="player2">Player 2</p>
         <img class="img2" src="images/dice6.png">
       </div>
     </div>
   </div>
 
-  <button class="btn" onclick="refresh()">Roll!</button>
+  <button class="roll-btn" onclick="refresh()">Roll!</button>
+  <button class="again-btn" onclick="playAgain()">Again?</button>
 
   <script src="index.js" charset="utf-8"></script>
 </body>
