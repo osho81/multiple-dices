@@ -83,7 +83,13 @@ function removeDice() {
 function refresh() {
   diceSound.play();
 
-    // Set interval for multiple dice rolls per player and round; loopCount to limit rolls
+  if (gameOn) {
+    // Hide add-btn & remove-btn
+    document.querySelector('.remove-btn').style.visibility = "hidden";
+    document.querySelector('.add-btn').style.visibility = "hidden";
+  }
+
+  // Set interval for multiple dice rolls per player and round; loopCount to limit rolls
   let loopCount = 0;
   let rollsPerRound = 4;
 
@@ -138,16 +144,12 @@ function refresh() {
     if (loopCount >= rollsPerRound) {
       clearInterval(myInterval);
       if (gameOn && dicesRolled.length > 0) {
-        setTimeout(function () {checkWinner() }, 200);
+        setTimeout(function () { checkWinner() }, 200);
       }
     }
   }
 
   function checkWinner() {
-    // Hide add-btn & remove-btn
-    document.querySelector('.remove-btn').style.visibility = "hidden";
-    document.querySelector('.add-btn').style.visibility = "hidden";
-
     // Check for highest dice roll
     let tempHighest = 0;
     for (let i = 0; i < currentPlayers.length; i++) {
