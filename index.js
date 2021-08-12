@@ -96,7 +96,7 @@ function refresh() {
   const myInterval = setInterval(function () {
     dicesRolled = [];
     rollDice();
-  }, 180);
+  }, 150);
 
   function rollDice() {
     currentPlayers.forEach(i => {
