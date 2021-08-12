@@ -6,6 +6,9 @@ let currentPlayers = [1, 2];  // Default starts with 2 dices/players
 const diceSound = new Audio('audio/diceSound.mp3');
 const winSound = new Audio('audio/winSound.mp3');
 
+
+/* ----- PREPARE DICE SET ----- */
+
 // General components not displayed at start
 document.querySelector('.remove-btn').style.visibility = "hidden";
 document.querySelector('.add-btn').style.visibility = "hidden";
@@ -72,7 +75,7 @@ function removeDice() {
   if ((gameOn && currentPlayers.length > 2) || (!gameOn && currentPlayers.length > 1)) {
     document.querySelector('.dice' + currentPlayers.length).remove();
     currentPlayers.pop();
-  } 
+  }
 }
 
 /* ----- ROLLING DICES ----- */
@@ -80,40 +83,67 @@ function removeDice() {
 function refresh() {
   diceSound.play();
 
-  currentPlayers.forEach(i => {
-    const rolledNum = Math.floor(Math.random() * 6) + 1;
-    const numImage = 'images/dice' + rolledNum + '.png';
+    // Set interval for multiple dice rolls per player and round; loopCount to limit rolls
+  let loopCount = 0;
+  let rollsPerRound = 4;
 
-    // Remove current dice's p and img
-    document.querySelector('.player' + i).remove()
-    document.querySelector('.img' + i).remove()
+  const myInterval = setInterval(function () {
+    dicesRolled = [];
+    rollDice();
+  }, 180);
 
-    // Create/append NEW paragraph & text to new dice
-    const player = document.createElement('P');
-    const playerText = document.createTextNode('Player ' + i);
-    player.classList.add('player' + i, 'player');
-    player.appendChild(playerText);
-    document.querySelector('.dice' + i).appendChild(player);
+  function rollDice() {
+    currentPlayers.forEach(i => {
+      console.log(i);
+      const rolledNum = Math.floor(Math.random() * 6) + 1;
+      const numImage = 'images/dice' + rolledNum + '.png';
 
-    // Create/append NEW image to new dice
-    const image = document.createElement('img');
-    image.setAttribute('class', 'img' + i);
-    image.setAttribute('src', numImage);
-    document.querySelector('.dice' + i).appendChild(image);
+      // Remove current dice's p and img
+      document.querySelector('.player' + i).remove()
+      document.querySelector('.img' + i).remove()
 
-    // Store player's dice as obj, then push it into the dedicated empty list
-    rollObj = { player_id: i, diceRoll: rolledNum };
-    dicesRolled.push(rollObj);
+      // Create/append NEW paragraph & text to new dice
+      const player = document.createElement('P');
+      const playerText = document.createTextNode('Player ' + i);
+      player.classList.add('player' + i, 'player');
+      player.appendChild(playerText);
+      document.querySelector('.dice' + i).appendChild(player);
 
-    // If game not on, hide player number
-    if (!gameOn) {
-      document.querySelector('.player' + i).style.visibility = "hidden";
+      // Create/append NEW image to new dice
+      const image = document.createElement('img');
+      image.setAttribute('class', 'img' + i);
+      image.setAttribute('src', numImage);
+      document.querySelector('.dice' + i).appendChild(image);
+
+      // Store player's dice as obj, then push it into the dedicated empty list
+      rollObj = { player_id: i, diceRoll: rolledNum };
+      dicesRolled.push(rollObj);
+
+      // If game not on, hide player number
+      if (!gameOn) {
+        document.querySelector('.player' + i).style.visibility = "hidden";
+      }
+    });
+
+    // At certain loopCount clear interval, i.e. stop dice roll for current round
+    loopCount++;
+    console.log("loopcount " + loopCount);
+    for (let i = 0; i < dicesRolled.length; i++) {
+      console.log("curr i: " + i);
+      console.log("play " + dicesRolled[i].player_id);
+      console.log("roll " + dicesRolled[i].diceRoll);
     }
-  });
 
-  /* ----- CHECKING WINNER ----- */
+    // Stop dice rolls for curent round and check winner if gameon
+    if (loopCount >= rollsPerRound) {
+      clearInterval(myInterval);
+      if (gameOn && dicesRolled.length > 0) {
+        setTimeout(function () {checkWinner() }, 200);
+      }
+    }
+  }
 
-  if (gameOn && currentPlayers.length > 1) {
+  function checkWinner() {
     // Hide add-btn & remove-btn
     document.querySelector('.remove-btn').style.visibility = "hidden";
     document.querySelector('.add-btn').style.visibility = "hidden";
@@ -131,7 +161,7 @@ function refresh() {
       if (dicesRolled[i].diceRoll < tempHighest) {
         document.querySelector('.dice' + dicesRolled[i].player_id).classList.remove('dice' + dicesRolled[i].player_id);
 
-        //change their opacity and remove current dice's p and img classes
+        // Change their opacity and remove current dice's p and img classes
         document.querySelector('.player' + dicesRolled[i].player_id).style.opacity = 0.7;
         document.querySelector('.player' + dicesRolled[i].player_id).classList.remove('player' + dicesRolled[i].player_id);
         document.querySelector('.img' + dicesRolled[i].player_id).style.opacity = 0.15;

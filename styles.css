@@ -106,12 +106,13 @@ p {
 img { 
   width: 85%;
   height: 85%;
-  background-color: rgb(52, 207, 207);
+  background-color: #69c278;
   border-radius: 30px;
 }
 
 .winner {
-  background-color: rgb(176, 255, 255);
+  /* background-color: rgb(176, 255, 255); */
+  background-color: #4dcd62;
   animation: win 0.4s;
 }
 
